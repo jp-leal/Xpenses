@@ -17,15 +17,43 @@ struct ContentView: View {
         NavigationStack {
             
             List{
-                ForEach(expenses.items) { item in
-                    HStack{
-                        Text(item.name)
-                        Spacer()
-                        Text(String(item.amount))
-                       
-                    }}
+                Section(header: Text("Personal")) {
+                    ForEach(expenses.items.filter {$0.type == "Personal"}) { item in
+                        
+                        HStack{
+                            VStack(alignment: .leading){
+                                Text(item.name)
+                                    .font(.headline)
+                                Text(item.type)
+                            }
+                            Spacer()
+                            AmountView(amount: item.amount)
+                            
+                        }
+                    }.onDelete(perform: { indexSet in
+                        removeItems(at: indexSet)
+                        
+                        
+                    })
+                }
+                Section(header: Text("Business")) {
+                    ForEach(expenses.items.filter {$0.type == "Business"}) { item in
+                        
+                        HStack{
+                            VStack(alignment: .leading){
+                                Text(item.name)
+                                    .font(.headline)
+                                Text(item.type)
+                            }
+                            Spacer()
+                            AmountView(amount: item.amount)
+                        }
+                    }.onDelete(perform: { indexSet in
+                        removeItems(at: indexSet)
+                    })
+                }
             }
-            
+                
                 .navigationTitle("Xpenses")
                 .toolbar {
                     Button("Add") {
@@ -33,12 +61,15 @@ struct ContentView: View {
                         
                     }
                 }
-        }.sheet(isPresented: $showSheet, content: {
-            
-            AddView(expenses: expenses)
-            
-            .presentationDetents([.height(300)])
-        })
+            }.sheet(isPresented: $showSheet, content: {
+                
+                AddView(expenses: expenses)
+                
+                    .presentationDetents([.height(300)])
+            })
+        }
+    func removeItems (at offsets: IndexSet) {
+        expenses.items.remove(atOffsets: offsets)
     }
 }
 
